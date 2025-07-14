@@ -1,12 +1,8 @@
 package com.hortanaporta.api.services;
-
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-
 import  com.hortanaporta.api.repository.*;
 import  com.hortanaporta.api.model.*;
-
 
 @Service
 public class PessoaService {
@@ -33,6 +29,4 @@ public class PessoaService {
     public void excluir(Long id) {
         PessoaRepository.deleteById(id);
     }
-
-
 }
