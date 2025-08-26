@@ -1,24 +1,30 @@
 package com.hortanaporta.api.model;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.Data;
-
+import java.util.List;
 
 @Entity
 @Table(name = "tb_categoria")
+@Data
 public class Categoria {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long CdCategoria;
-    private String NmCategoria;
+    @Column(name = "cd_categoria")
+    private Long id;
 
+    @Column(name = "nm_categoria", nullable = false)
+    private String nome;
 
-    // Outros campos...
-
-    @OneToMany(mappedBy = "categoria")
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Produto> produtos;
 
-    // Getters e Setters
+    // Construtores
+    public Categoria() {
+    }
+
+    public Categoria(String nome) {
+        this.nome = nome;
+    }
 }

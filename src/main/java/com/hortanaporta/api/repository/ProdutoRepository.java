@@ -8,6 +8,11 @@ import org.springframework.data.repository.query.Param;
 import com.hortanaporta.api.model.Produto;
 
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
-    @Query("SELECT p FROM TbProduto p WHERE p.categoria.id = :categoriaId")
+    
+    // Altere de TbProduto para Produto
+    @Query("SELECT p FROM Produto p WHERE p.categoria.id = :categoriaId")
     List<Produto> buscarPorCategoriaId(@Param("categoriaId") Long categoriaId);
+    
+    // Ou melhor ainda, use a consulta derivada do Spring Data JPA (sem @Query necessário):
+    List<Produto> findByCategoriaId(Long categoriaId);
 }

@@ -7,26 +7,26 @@ import  com.hortanaporta.api.model.*;
 @Service
 public class PessoaService {
 
-    private final PessoaRepository PessoaRepository;
+    private final PessoaRepository pessoaRepository;
 
-    public PessoaService(PessoaRepository PessoaRepository) {
-        this.PessoaRepository = PessoaRepository;
+    public PessoaService(PessoaRepository pessoaRepository) {
+        this.pessoaRepository = pessoaRepository;
     }
 
     public List<Pessoa> listarTodos() {
-        return PessoaRepository.findAll();
+        return pessoaRepository.findAll();
     }
 
     public Pessoa buscarPorId(Long id) {
-        return PessoaRepository.findById(id)
+        return pessoaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrado"));
     }
 
-    public Pessoa salvar(Pessoa Pessoa) {
-        return PessoaRepository.save(Pessoa);
+    public Pessoa salvar(Pessoa pessoa) {
+        return pessoaRepository.save(pessoa);
     }
 
     public void excluir(Long id) {
-        PessoaRepository.deleteById(id);
+        pessoaRepository.deleteById(id);
     }
 }
