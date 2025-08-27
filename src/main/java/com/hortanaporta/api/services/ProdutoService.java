@@ -33,7 +33,7 @@ public class ProdutoService {
         produtoRepository.deleteById(id);
     }
 
-    public List<Produto> buscarPorCategoria(Long categoriaId) {
-        return produtoRepository.buscarPorCategoriaId(categoriaId);
+    public List<Produto> buscarPorCategoria(String categoria) {
+        return produtoRepository.findByCategoria(categoria);
     }
 }

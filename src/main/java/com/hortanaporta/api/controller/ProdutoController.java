@@ -19,34 +19,39 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public List<Produto> listarTodos() {
-        return produtoService.listarTodos();
+    public ResponseEntity<List<Produto>> listarTodos() {
+        List<Produto> produtos = produtoService.listarTodos();
+        return ResponseEntity.ok(produtos);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Produto> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(produtoService.buscarPorId(id));
+        Produto produto = produtoService.buscarPorId(id);
+        return ResponseEntity.ok(produto);
     }
 
     @PostMapping
     public ResponseEntity<Produto> criar(@RequestBody Produto produto) {
-        return ResponseEntity.ok(produtoService.salvar(produto));
+        Produto produtoSalvo = produtoService.salvar(produto);
+        return ResponseEntity.status(201).body(produtoSalvo); // HTTP 201 Created
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Produto> atualizar(@PathVariable Long id, @RequestBody Produto produto) {
         produto.setId(id);
-        return ResponseEntity.ok(produtoService.salvar(produto));
+        Produto produtoAtualizado = produtoService.salvar(produto);
+        return ResponseEntity.ok(produtoAtualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         produtoService.excluir(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build(); // HTTP 204 No Content
     }
 
-    @GetMapping("/categoria/{categoriaId}")
-    public List<Produto> buscarPorCategoria(@PathVariable Long categoriaId) {
-        return produtoService.buscarPorCategoria(categoriaId);
+    @GetMapping("/categoria/{categoria}")
+    public ResponseEntity<List<Produto>> buscarPorCategoria(@PathVariable String categoria) {
+        List<Produto> produtos = produtoService.buscarPorCategoria(categoria);
+        return ResponseEntity.ok(produtos);
     }
 }
