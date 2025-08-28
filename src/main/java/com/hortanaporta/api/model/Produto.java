@@ -42,4 +42,8 @@ public class Produto {
     @Column(name = "categoria")
     @JsonProperty("categoria")
     private String categoria;
+
+     @Column(name = "observacoes")
+    @JsonProperty("observacoes")
+    private String observacoes;
 }
