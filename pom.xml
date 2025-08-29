@@ -58,6 +58,10 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
 		
 		<!-- Dependências do Jackson (já incluídas no spring-boot-starter-web, mas para garantir versão específica) -->
 		<dependency>
