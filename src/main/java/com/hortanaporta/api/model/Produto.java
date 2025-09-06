@@ -23,7 +23,7 @@ public class Produto {
     @JsonProperty("caminho_imagem")
     private String caminhoImagem;
 
-    @Column(name = "data_validade")
+    @Column(name = "data_validade", nullable = true)
     @JsonProperty("data_validade")
     private String dataValidade;
 
