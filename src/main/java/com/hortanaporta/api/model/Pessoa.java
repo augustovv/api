@@ -12,7 +12,7 @@ import lombok.Data;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Pessoa {
 
-        @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CdPessoa")
     @JsonProperty("CdPessoa") // ← ADICIONE ESTA LINHA
