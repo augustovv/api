@@ -39,46 +39,26 @@ public class PessoaService {
         pessoaRepository.deleteById(id);
     }
 
-    // MÉTODO CORRIGIDO: Agora funciona com senhas em texto puro E BCrypt
+    // NO PessoaService.java - ATUALIZE o método autenticar
     public Optional<Pessoa> autenticar(String email, String senha) {
-    Pessoa pessoa = pessoaRepository.findByEmail(email);
-    
-    if (pessoa != null) {
-        String senhaArmazenada = pessoa.getSenha();
-        
-        System.out.println("=== TENTATIVA DE LOGIN ===");
-        System.out.println("Email: " + email);
-        System.out.println("Senha fornecida: " + senha);
-        System.out.println("Senha armazenada: " + senhaArmazenada);
-        System.out.println("É BCrypt?: " + senhaArmazenada.startsWith("$2a$"));
-        
-        // Se a senha no banco É BCrypt, usa passwordEncoder.matches()
-        if (senhaArmazenada.startsWith("$2a$")) {
-            System.out.println("Validando com BCrypt...");
-            if (passwordEncoder.matches(senha, senhaArmazenada)) {
-                System.out.println("BCrypt: SENHA VÁLIDA");
-                return Optional.of(pessoa);
-            } else {
-                System.out.println("BCrypt: SENHA INVÁLIDA");
-            }
-        } 
-        // Se a senha no banco é TEXTO PURO, compara diretamente
-        else if (senhaArmazenada.equals(senha)) {
-            System.out.println("Texto puro: SENHA VÁLIDA");
-            // Atualiza para BCrypt automaticamente
-            pessoa.setSenha(passwordEncoder.encode(senha));
-            pessoaRepository.save(pessoa);
-            System.out.println("Senha migrada para BCrypt");
-            return Optional.of(pessoa);
-        } else {
-            System.out.println("Texto puro: SENHA INVÁLIDA");
+        System.out.println("=== DEBUG AUTENTICAÇÃO ===");
+
+        Pessoa pessoa = buscarPorEmail(email);
+        if (pessoa == null) {
+            System.out.println("Pessoa não encontrada para email: " + email);
+            return Optional.empty();
         }
-    } else {
-        System.out.println("USUÁRIO NÃO ENCONTRADO: " + email);
+
+        System.out.println("Pessoa encontrada - Role: '" + pessoa.getRole() + "'");
+
+        if (passwordEncoder.matches(senha, pessoa.getSenha())) {
+            System.out.println("Senha correta - Role final: '" + pessoa.getRole() + "'");
+            return Optional.of(pessoa); // ← NÃO CRIE NOVA INSTÂNCIA!
+        } else {
+            System.out.println("Senha incorreta");
+            return Optional.empty();
+        }
     }
-    
-    return Optional.empty();
-}
 
     public Pessoa buscarPorEmail(String email) {
         return pessoaRepository.findByEmail(email);

@@ -13,15 +13,21 @@ public class JwtService {
     private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final long expirationTime = 86400000; // 24 horas
 
-    public String generateToken(String email, Long userId) {
-        return Jwts.builder()
-                .setSubject(email)
-                .claim("userId", userId)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(secretKey)
-                .compact();
-    }
+    public String generateToken(String email, Long userId, String role) {
+    System.out.println("=== DEBUG JWT GENERATION ===");
+    System.out.println("Email: " + email);
+    System.out.println("UserId: " + userId);
+    System.out.println("Role: " + role); // ← VERIFIQUE SE ESTÁ CHEGANDO AQUI
+    
+    return Jwts.builder()
+            .setSubject(email)
+            .claim("userId", userId)
+            .claim("role", role) // ← ESTÁ AQUI, MAS PODE ESTAR NULL
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+            .signWith(secretKey)
+            .compact();
+}
 
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
@@ -44,9 +50,9 @@ public class JwtService {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token);
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
