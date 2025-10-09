@@ -34,6 +34,3 @@ public class Pessoa {
     @JsonProperty("SenhaPessoa") // ← ADICIONE ESTA LINHA
     private String senha;
 }
-
- 
-   
