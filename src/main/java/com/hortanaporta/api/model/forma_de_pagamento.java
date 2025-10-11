@@ -1,6 +1,8 @@
 package com.hortanaporta.api.model;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,5 +22,6 @@ public class forma_de_pagamento {
     private String descricao;
 
     @OneToMany(mappedBy = "forma_de_pagamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Pedido> pedidos = new ArrayList<>();
 }

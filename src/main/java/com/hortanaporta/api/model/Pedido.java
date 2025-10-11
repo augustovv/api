@@ -2,6 +2,8 @@ package com.hortanaporta.api.model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -60,7 +62,7 @@ public class Pedido {
     }
 
     public void adicionarItem(ItemPedido item) {
-        item.setPedido(this); // ⚠️ IMPORTANTE: Setar o pedido no item
+        item.setPedido(this); 
         this.itensPedido.add(item);
     }
 

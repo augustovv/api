@@ -20,7 +20,6 @@ public class ItemPedido {
     @JsonProperty("cd_item_pedido")
     private Long id;
 
-    // ✅ CORRIGIDO: ManyToOne com fetch EAGER e nullable false
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cd_pedido", nullable = false)
     @JsonIgnore // Evita recursão infinita no JSON

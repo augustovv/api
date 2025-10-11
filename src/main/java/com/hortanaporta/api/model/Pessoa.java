@@ -3,6 +3,7 @@ package com.hortanaporta.api.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
@@ -42,6 +43,7 @@ public class Pessoa {
     private String role = "CLIENTE"; // valor padrão
 
     @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Pedido> pedidos;
 
   
