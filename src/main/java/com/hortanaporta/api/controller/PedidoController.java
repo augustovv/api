@@ -1,59 +1,64 @@
 package com.hortanaporta.api.controller;
-
-
 import com.hortanaporta.api.services.PedidoService;
-import com.hortanaporta.api.model.Pedido;
-
 import jakarta.validation.Valid;
+import com.hortanaporta.api.model.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
+import com.hortanaporta.api.services.PessoaService;
+import com.hortanaporta.api.services.EnderecoService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/pedidos")
+@CrossOrigin("*")
 public class PedidoController {
 
     @Autowired
     private PedidoService pedidoService;
+    private final PessoaService pessoaService;
+    private final EnderecoService enderecoService;
 
-    @GetMapping
-    public ResponseEntity<List<Pedido>> listarPedidos() {
-        List<Pedido> pedidos = pedidoService.listarTodos();
-        return ResponseEntity.ok(pedidos);
+    public PedidoController(PedidoService pedidoService, PessoaService pessoaService, EnderecoService enderecoService) {
+        this.pedidoService = pedidoService;
+        this.pessoaService = pessoaService;
+        this.enderecoService = enderecoService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Pedido> buscarPedido(@PathVariable Long id) {
-        Pedido pedido = pedidoService.buscarPorId(id);
-        if (pedido == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(pedido);
-    }
+
 
     @PostMapping
-    public ResponseEntity<Pedido> criarPedido(@Valid @RequestBody Pedido pedido) {
-        Pedido novoPedido = pedidoService.criar(pedido);
-        return ResponseEntity.ok(novoPedido);
-    }
+    public ResponseEntity<?> criarPedido(@RequestBody Pedido pedido) {
+        try {
+            // Validar dados obrigatórios
+            if (pedido.getPessoa() == null || pedido.getPessoa().getId() == null) {
+                return ResponseEntity.badRequest().body("Pessoa é obrigatória");
+            }
+            
+            if (pedido.getEnderecoEntrega() == null || pedido.getEnderecoEntrega().getCd_endereco() == null) {
+                return ResponseEntity.badRequest().body("Endereço de entrega é obrigatório");
+            }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Pedido> atualizarPedido(@PathVariable Long id, @Valid @RequestBody Pedido pedido) {
-        Pedido pedidoAtualizado = pedidoService.atualizar(id, pedido);
-        if (pedidoAtualizado == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(pedidoAtualizado);
-    }
+            Pessoa pessoaDoPedido = pessoaService.buscarPorId(pedido.getPessoa().getId());
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarPedido(@PathVariable Long id) {
-        boolean removido = pedidoService.deletar(id);
-        if (!removido) {
-            return ResponseEntity.notFound().build();
+
+
+
+            pedido.getPessoa().setNome(pessoaDoPedido.getNome());;
+            pedido.getPessoa().setCpf(pessoaDoPedido.getCpf());
+            pedido.getPessoa().setEmail(pessoaDoPedido.getEmail());
+
+            Pedido pedidoSalvo = pedidoService.criar(pedido);
+            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoSalvo);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro ao criar pedido: " + e.getMessage());
         }
-        return ResponseEntity.noContent().build();
     }
 }
+

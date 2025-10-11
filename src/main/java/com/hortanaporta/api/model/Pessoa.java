@@ -1,6 +1,8 @@
 package com.hortanaporta.api.model;
 
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
@@ -14,8 +16,8 @@ public class Pessoa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CdPessoa")
-    @JsonProperty("CdPessoa")
+    @Column(name = "cd_pessoa")
+    @JsonProperty("cd_pessoa")
     private Long id;
 
     @Column(name = "NmPessoa")
@@ -38,4 +40,9 @@ public class Pessoa {
     @Column(name = "RolePessoa")
     @JsonProperty("RolePessoa")
     private String role = "CLIENTE"; // valor padrão
+
+    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Pedido> pedidos;
+
+  
 }

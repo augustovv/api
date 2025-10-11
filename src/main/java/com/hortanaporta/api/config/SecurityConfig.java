@@ -30,6 +30,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/pessoas").permitAll()
+                        .requestMatchers("/api/pedidos").permitAll()
+
             .requestMatchers("/api/enderecos/cep/**").permitAll() // ← PERMITE CONSULTA DE CEP
             .requestMatchers("/api/enderecos/**").authenticated() // ← ENDEREÇOS PRECISAM DE AUTH
             .requestMatchers("/api/**").authenticated()

@@ -1,5 +1,7 @@
 package com.hortanaporta.api.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -13,7 +15,7 @@ public class Endereco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cd_endereco")
     @JsonProperty("cd_endereco")
-    private Long id;
+    private Long cd_endereco;
 
     @Column(name = "cep", nullable = false, length = 9)
     @JsonProperty("cep")
@@ -50,6 +52,9 @@ public class Endereco {
     @Column(name = "endereco_principal")
     @JsonProperty("endereco_principal")
     private Boolean enderecoPrincipal = false;
+
+    @OneToMany(mappedBy = "enderecoEntrega", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Pedido> pedidos;
 
     // Construtor para facilitar criação via API
     public Endereco() {}
