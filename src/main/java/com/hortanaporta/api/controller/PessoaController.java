@@ -4,6 +4,7 @@ import com.hortanaporta.api.services.*;
 
 import jakarta.validation.Valid;
 
+import com.hortanaporta.api.dto.AtualizarPessoaDTO;
 import com.hortanaporta.api.model.*;
 
 import org.springframework.http.ResponseEntity;
@@ -49,14 +50,33 @@ public class PessoaController {
 }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Pessoa> atualizar(@PathVariable Long id, @Valid @RequestBody Pessoa pessoa) {
-        try {
-            pessoa.setId(id);
-            return ResponseEntity.ok(pessoaService.salvar(pessoa));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+public ResponseEntity<Pessoa> atualizar(
+        @PathVariable Long id, 
+        @Valid @RequestBody AtualizarPessoaDTO atualizarPessoaDTO) {
+    
+    try {
+        // Busca a pessoa existente
+        Pessoa pessoaExistente = pessoaService.buscarPorId(id);
+        
+        // Atualiza os campos permitidos
+        pessoaExistente.setNome(atualizarPessoaDTO.getNome());
+        pessoaExistente.setEmail(atualizarPessoaDTO.getEmail());
+        
+        // Só atualiza senha se foi fornecida
+        if (atualizarPessoaDTO.getSenha() != null && 
+            !atualizarPessoaDTO.getSenha().trim().isEmpty()) {
+            pessoaExistente.setSenha(atualizarPessoaDTO.getSenha());
         }
+        
+        // Salva as alterações
+        Pessoa pessoaAtualizada = pessoaService.salvar(pessoaExistente);
+        
+        return ResponseEntity.ok(pessoaAtualizada);
+        
+    } catch (RuntimeException e) {
+        return ResponseEntity.badRequest().build();
     }
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
