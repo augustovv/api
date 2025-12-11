@@ -32,7 +32,6 @@ public class Pedido {
     @Column(name = "data_pedido", nullable = false)
     @JsonProperty("data_pedido")
     private LocalDateTime dataPedido;
-
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonProperty("itens_pedido")
     private List<ItemPedido> itensPedido = new ArrayList<>();
@@ -65,6 +64,11 @@ public class Pedido {
         item.setPedido(this); 
         this.itensPedido.add(item);
     }
+
+  
+
+    
+    
 
     @PrePersist
     @PreUpdate

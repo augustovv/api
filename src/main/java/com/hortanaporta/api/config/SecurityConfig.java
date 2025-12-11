@@ -33,7 +33,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             .requestMatchers("/api/pedidos").permitAll()
 
             .requestMatchers("/api/enderecos/cep/**").permitAll() // ← PERMITE CONSULTA DE CEP
-            .requestMatchers("/api/enderecos/**").authenticated() // ← ENDEREÇOS PRECISAM DE AUTH
+            .requestMatchers("/api/enderecos/**").permitAll() // ← ENDEREÇOS PRECISAM DE AUTH
             .requestMatchers("/api/**").authenticated()
             .anyRequest().permitAll()
         )

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import com.hortanaporta.api.services.PessoaService;
 import com.hortanaporta.api.services.EnderecoService;
+import com.hortanaporta.api.services.FormaDePagamentoService;
 import com.hortanaporta.api.services.ProdutoService;
-import com.hortanaporta.api.model.Pessoa;
 @RestController
 @RequestMapping("/api/pedidos")
 @CrossOrigin("*")
@@ -23,12 +23,14 @@ public class PedidoController {
     private final PessoaService pessoaService;
     private final EnderecoService enderecoService;
     private final ProdutoService produtoService;
+    private final FormaDePagamentoService formaDePagamentoService;
 
-    public PedidoController(PedidoService pedidoService, PessoaService pessoaService, EnderecoService enderecoService, ProdutoService produtoService) {
+    public PedidoController(PedidoService pedidoService, PessoaService pessoaService, EnderecoService enderecoService, ProdutoService produtoService, FormaDePagamentoService formaDePagamentoService) {
         this.pedidoService = pedidoService;
         this.pessoaService = pessoaService;
         this.enderecoService = enderecoService;
         this.produtoService = produtoService;
+        this.formaDePagamentoService = formaDePagamentoService;
     }
 
     @GetMapping
@@ -69,62 +71,78 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<?> criarPedido(@RequestBody Pedido pedido) {
-        try {
-            // Validar dados obrigatórios
-            if (pedido.getPessoa() == null || pedido.getPessoa().getId() == null) {
-                return ResponseEntity.badRequest().body("Pessoa é obrigatória");
-            }
-            
-            if (pedido.getEnderecoEntrega() == null || pedido.getEnderecoEntrega().getCd_endereco() == null) {
-                return ResponseEntity.badRequest().body("Endereço de entrega é obrigatório");
-            }
-
-            Pessoa pessoaDoPedido = pessoaService.buscarPorId(pedido.getPessoa().getId());
-            pedido.getPessoa().setNome(pessoaDoPedido.getNome());;
-            pedido.getPessoa().setCpf(pessoaDoPedido.getCpf());
-            pedido.getPessoa().setEmail(pessoaDoPedido.getEmail());
-
-            Endereco enderecoDoPedido = enderecoService.buscarEnderecosPorPessoa(pedido.getPessoa().getId())
-                .stream()
-                .filter(endereco -> endereco.getCd_endereco().equals(pedido.getEnderecoEntrega().getCd_endereco()))
-                .findFirst()
-                .orElse(null);
-            pedido.getEnderecoEntrega().setLogradouro(enderecoDoPedido.getLogradouro());
-            pedido.getEnderecoEntrega().setNumero(enderecoDoPedido.getNumero());
-            pedido.getEnderecoEntrega().setComplemento(enderecoDoPedido.getComplemento());
-            pedido.getEnderecoEntrega().setBairro(enderecoDoPedido.getBairro());
-            pedido.getEnderecoEntrega().setCidade(enderecoDoPedido.getCidade());
-            pedido.getEnderecoEntrega().setEstado(enderecoDoPedido.getEstado());
-            pedido.getEnderecoEntrega().setCep(enderecoDoPedido.getCep());
-
-
-            for(var i = 0; i < pedido.getItensPedido().size(); i++) {
-                Produto produtoDoItem = this.produtoService.buscarPorId(pedido.getItensPedido().get(i).getProduto().getId());
-                pedido.getItensPedido().get(i).getProduto().setNome(produtoDoItem.getNome());
-                pedido.getItensPedido().get(i).getProduto().setObservacoes(produtoDoItem.getObservacoes());
-                pedido.getItensPedido().get(i).getProduto().setPreco(produtoDoItem.getPreco());
-                pedido.getItensPedido().get(i).getProduto().setCaminhoImagem(produtoDoItem.getCaminhoImagem());
-                pedido.getItensPedido().get(i).getProduto().setCategoria(produtoDoItem.getCategoria());
-                pedido.getItensPedido().get(i).getProduto().setAtivo(produtoDoItem.getAtivo());
-                pedido.getItensPedido().get(i).getProduto().setDataValidade(produtoDoItem.getDataValidade());
-
-
-                
-                if (pedido.getItensPedido().get(i).getQuantidade() == null || pedido.getItensPedido().get(i).getQuantidade() <= 0) {
-                    return ResponseEntity.badRequest().body("Quantidade deve ser maior que zero para o produto: " + produtoDoItem.getNome());
-                }
-            }
-
-            
-
-            Pedido pedidoSalvo = pedidoService.criar(pedido);
-            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoSalvo);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Erro ao criar pedido: " + e.getMessage());
+    try {
+        // 1. VALIDAÇÕES INICIAIS
+        if (pedido.getPessoa() == null || pedido.getPessoa().getId() == null) {
+            return ResponseEntity.badRequest().body("Pessoa é obrigatória");
         }
+        
+        if (pedido.getEnderecoEntrega() == null || pedido.getEnderecoEntrega().getCd_endereco() == null) {
+            return ResponseEntity.badRequest().body("Endereço de entrega é obrigatório");
+        }
+
+        if (pedido.getForma_de_pagamento() == null) {
+           
+            return ResponseEntity.badRequest().body("Forma de pagamento está nula" + pedido.getForma_de_pagamento() + " " + pedido.getForma_de_pagamento().getCd_forma_de_pagamento());
+        }
+        if (pedido.getForma_de_pagamento().getCd_forma_de_pagamento() == null) {
+            return ResponseEntity.badRequest().body("o código da Forma de pagamento está nulo" + pedido.getForma_de_pagamento() + " " + pedido.getForma_de_pagamento().getCd_forma_de_pagamento());
+        }
+
+        // 2. BUSCAR E COMPLETAR DADOS DA PESSOA
+        Pessoa pessoaDoPedido = pessoaService.buscarPorId(pedido.getPessoa().getId());
+        if (pessoaDoPedido == null) {
+            return ResponseEntity.badRequest().body("Pessoa não encontrada");
+        }
+        pedido.setPessoa(pessoaDoPedido);
+
+        // 3. BUSCAR E COMPLETAR DADOS DO ENDEREÇO
+        Endereco enderecoDoPedido = enderecoService.buscarEnderecosPorPessoa(pedido.getPessoa().getId())
+            .stream()
+            .filter(endereco -> endereco.getCd_endereco().equals(pedido.getEnderecoEntrega().getCd_endereco()))
+            .findFirst()
+            .orElse(null);
+            
+        if (enderecoDoPedido == null) {
+            return ResponseEntity.badRequest().body("Endereço não encontrado");
+        }
+        pedido.setEnderecoEntrega(enderecoDoPedido);
+
+        // 4. BUSCAR E COMPLETAR FORMA DE PAGAMENTO (NOVO)
+        forma_de_pagamento formaPagamento = formaDePagamentoService.buscarPorId(pedido.getForma_de_pagamento().getCd_forma_de_pagamento());
+        if (formaPagamento == null) {
+            return ResponseEntity.badRequest().body("Forma de pagamento não encontrada");
+        }
+        pedido.setForma_de_pagamento(formaPagamento); // ⬅️ IMPORTANTE: Usar entidade gerenciada
+
+        // 5. VALIDAR E COMPLETAR DADOS DOS ITENS
+        for (ItemPedido item : pedido.getItensPedido()) {
+            // Validar quantidade
+            if (item.getQuantidade() == null || item.getQuantidade() <= 0) {
+                return ResponseEntity.badRequest().body("Quantidade deve ser maior que zero");
+            }
+            
+            // Buscar produto completo
+            Produto produtoDoItem = produtoService.buscarPorId(item.getProduto().getId());
+            if (produtoDoItem == null) {
+                return ResponseEntity.badRequest().body("Produto não encontrado: ID " + item.getProduto().getId());
+            }
+            
+            item.setProduto(produtoDoItem);
+            item.setPedido(pedido); // Estabelecer relação bidirecional
+        }
+
+        // 6. SALVAR O PEDIDO
+        Pedido pedidoSalvo = pedidoService.criar(pedido);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoSalvo);
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Erro ao criar pedido: " + e.getMessage());
     }
 }
+}
 
+   
