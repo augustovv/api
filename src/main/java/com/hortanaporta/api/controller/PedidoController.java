@@ -53,8 +53,10 @@ public class PedidoController {
     public ResponseEntity<Pedido> atualizarPedido(@PathVariable Long id, @RequestBody Pedido pedido) {
         Pedido pedidoAtualizado = pedidoService.atualizar(id, pedido);
         if (pedidoAtualizado != null) {
+            System.out.println("Pedido com ID " + id + " atualizado com sucesso.");
             return ResponseEntity.ok(pedidoAtualizado);
         } else {
+            System.out.println("Pedido com ID " + id + " não encontrado para atualização.");
             return ResponseEntity.notFound().build();
         }
     }   

@@ -45,14 +45,18 @@ public class PedidoService {
         Optional<Pedido> pedidoExistente = pedidoRepository.findById(id);
         if (pedidoExistente.isPresent()) {
             Pedido pedido = pedidoExistente.get();
-            // Atualize os campos necessários do pedido
-            //pedido.setObservacao(pedidoAtualizado.getObservacao());
-            //pedido.setQuantidade(pedidoAtualizado.getQuantidade());
-            // Adicione outros campos conforme necessário
+     
+            pedido.setCd_pedido(id);
+            pedido.setStatus(pedidoAtualizado.getStatus());
+            pedido.setObservacoes(pedidoAtualizado.getObservacoes());
+
+        
             return pedidoRepository.save(pedido);
-        }
+        
+        }else{
         return null;
     }
+    }   
 
     public boolean deletar(Long id) {
         if (pedidoRepository.existsById(id)) {
