@@ -1,11 +1,8 @@
 package com.hortanaporta.api.model;
 
 import java.util.List;
-<<<<<<< HEAD
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-=======
->>>>>>> c4292f802b5d7b04ecafcd02da41d68d4f7653ab
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
