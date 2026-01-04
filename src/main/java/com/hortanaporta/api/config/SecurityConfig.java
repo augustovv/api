@@ -28,12 +28,20 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .cors(cors -> cors.configure(http))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            // 🔓 ENDPOINTS PÚBLICOS
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/pessoas").permitAll()
-            .requestMatchers("/api/pedidos").permitAll()
-            .requestMatchers("/api/enderecos/cep/**").permitAll() // ← PERMITE CONSULTA DE CEP
-            .requestMatchers("/api/enderecos/**").permitAll() // ← ENDEREÇOS PRECISAM DE AUTH
+            .requestMatchers("/api/enderecos/cep/**").permitAll()
+            
+            // 📧 ENDPOINTS DE EMAIL PÚBLICOS
+            .requestMatchers("/api/email/test").permitAll()              // Teste
+            .requestMatchers("/api/email/enviar").permitAll()            // Enviar email
+            .requestMatchers("/api/email/confirmacao-pedido").permitAll() // Confirmação
+            .requestMatchers("/api/email/recuperacao-senha").permitAll()  // Recuperação
+            
+            // 🔐 TODO O RESTO DA API PRECISA DE AUTENTICAÇÃO
             .requestMatchers("/api/**").authenticated()
+            
             .anyRequest().permitAll()
         )
         .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
