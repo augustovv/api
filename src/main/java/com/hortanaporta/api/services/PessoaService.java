@@ -40,25 +40,30 @@ public class PessoaService {
     }
 
     // NO PessoaService.java - ATUALIZE o método autenticar
-    public Optional<Pessoa> autenticar(String email, String senha) {
-        System.out.println("=== DEBUG AUTENTICAÇÃO ===");
-
-        Pessoa pessoa = buscarPorEmail(email);
-        if (pessoa == null) {
-            System.out.println("Pessoa não encontrada para email: " + email);
-            return Optional.empty();
-        }
-
-        System.out.println("Pessoa encontrada - Role: '" + pessoa.getRole() + "'");
-
-        if (passwordEncoder.matches(senha, pessoa.getSenha())) {
-            System.out.println("Senha correta - Role final: '" + pessoa.getRole() + "'");
-            return Optional.of(pessoa); // ← NÃO CRIE NOVA INSTÂNCIA!
-        } else {
-            System.out.println("Senha incorreta");
-            return Optional.empty();
-        }
+   public Optional<Pessoa> autenticar(String email, String senha) {
+    System.out.println("=== DEBUG AUTENTICAÇÃO ===");
+    
+    Pessoa pessoa = buscarPorEmail(email);
+    if (pessoa == null) {
+        System.out.println("Pessoa não encontrada para email: " + email);
+        return Optional.empty();
     }
+
+    // DEBUG CRÍTICO: Verificar a role que veio do banco
+    System.out.println("✅ Pessoa encontrada no banco:");
+    System.out.println("ID: " + pessoa.getId());
+    System.out.println("Email: " + pessoa.getEmail());
+    System.out.println("Role do BANCO: '" + pessoa.getRole() + "'");
+    System.out.println("Tipo: " + (pessoa.getRole() != null ? pessoa.getRole().getClass() : "null"));
+    
+    if (passwordEncoder.matches(senha, pessoa.getSenha())) {
+        System.out.println("🎉 Login bem-sucedido! Role FINAL: '" + pessoa.getRole() + "'");
+        return Optional.of(pessoa);
+    } else {
+        System.out.println("❌ Senha incorreta");
+        return Optional.empty();
+    }
+}
 
     public Pessoa buscarPorEmail(String email) {
         return pessoaRepository.findByEmail(email);

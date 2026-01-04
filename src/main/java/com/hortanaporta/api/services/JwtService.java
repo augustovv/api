@@ -38,6 +38,25 @@ public class JwtService {
                 .getSubject();
     }
 
+    public String extractRole(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            
+            String role = claims.get("role", String.class);
+            System.out.println("=== DEBUG EXTRACT ROLE ===");
+            System.out.println("Role extraída do token: '" + role + "'");
+            
+            return role;
+        } catch (Exception e) {
+            System.out.println("Erro ao extrair role: " + e.getMessage());
+            return "CLIENTE"; // fallback
+        }
+    }
+
     public Long extractUserId(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
