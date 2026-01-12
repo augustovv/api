@@ -51,4 +51,15 @@ public class ItemPedido {
             this.subtotal = 0.0;
         }
     }
+
+    public Long getCdItemPedido() {
+        return this.id;
+    }
+
+    public void setPrecoUnitario(Double precoUnitario) {
+        this.precoUnitario = precoUnitario;
+        calcularSubtotal();
+    }   
+    
+
 }

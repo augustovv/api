@@ -125,6 +125,21 @@ public class PedidoController {
         }
     }   
 
+     // Novo método para atualização simplificada
+    @PutMapping("/{id}/simplificado")
+    public ResponseEntity<Pedido> atualizarPedidoSimplificado(
+            @PathVariable Long id,
+            @RequestBody Pedido pedidoSimplificado) {
+        
+        Pedido pedido = pedidoService.atualizarSimplificado(id, pedidoSimplificado);
+        
+        if (pedido != null) {
+            return ResponseEntity.ok(pedido);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarPedido(@PathVariable Long id) {  
         boolean deletado = pedidoService.deletar(id);

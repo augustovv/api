@@ -65,10 +65,7 @@ public class Pedido {
         this.itensPedido.add(item);
     }
 
-  
-
-    
-    
+     
 
     @PrePersist
     @PreUpdate

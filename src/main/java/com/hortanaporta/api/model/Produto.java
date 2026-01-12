@@ -33,7 +33,7 @@ public class Produto {
 
     @Column(name = "preco", nullable = false)
     @JsonProperty("preco")
-    private Long preco;
+    private Double preco;
 
     @Column(name = "unidade")
     @JsonProperty("unidade")
@@ -46,4 +46,8 @@ public class Produto {
      @Column(name = "observacoes")
     @JsonProperty("observacoes")
     private String observacoes;
+
+    public Long getCdProduto() {
+        return this.id;
+    }
 }
